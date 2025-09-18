@@ -2623,8 +2623,7 @@ def main():
                     new_text = "✅ " + current_text
                     self.device_listbox.delete(i)
                     self.device_listbox.insert(i, new_text)
-        
-        self.update_device_statistics()
+					self.update_device_statistics()
 
 	# Check root privileges
     if os.geteuid() != 0:
