@@ -667,7 +667,654 @@ class SIH2025SecureWipeApplication:
 
         # Problem statement reference
         problem_statement = tk.Label(title_section,
-				             self.update_device_statistics()
+									text="💰 Addressing India's ₹50,000+ Crore E-waste Challenge with Secure Data Wiping",
+                                     bg=self.colors['secondary'],
+                                     fg=self.colors['text_secondary'],
+                                     font=('Segoe UI', 11, 'italic'))
+        problem_statement.pack(pady=(3, 0))
+        
+        # USB status indicator with real-time updates
+        usb_status_frame = tk.Frame(header_frame, bg=self.colors['secondary'])
+        usb_status_frame.pack(pady=(0, 20))
+        
+        self.usb_status_label = tk.Label(usb_status_frame,
+                                        text="🔍 Initializing USB certificate storage...",
+                                        bg=self.colors['secondary'],
+                                        fg=self.colors['warning'],
+                                        font=('Segoe UI', 10, 'bold'))
+        self.usb_status_label.pack()
+        
+        # Feature highlights
+        features_frame = tk.Frame(header_frame, bg=self.colors['secondary'])
+        features_frame.pack(pady=(0, 15))
+        
+        features_text = "🔒 5-Layer NIST Wiping • 📜 Tamper-Proof Certificates • 💾 USB Storage • 🚫 Air-Gapped Operation"
+        tk.Label(features_frame,
+                text=features_text,
+                bg=self.colors['secondary'],
+                fg=self.colors['text_accent'],
+                font=('Segoe UI', 9)).pack()
+    
+    def create_device_management_panel(self, parent):
+        """Create advanced device management panel"""
+        device_panel = tk.Frame(parent, bg=self.colors['secondary'], relief=tk.RAISED, bd=2)
+        device_panel.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 8))
+        
+        # Panel header with statistics
+        header_frame = tk.Frame(device_panel, bg=self.colors['secondary'])
+        header_frame.pack(fill=tk.X, pady=15)
+        
+        tk.Label(header_frame,
+                text="📱 Storage Device Management",
+                bg=self.colors['secondary'],
+                fg=self.colors['text_primary'],
+                font=('Segoe UI', 14, 'bold')).pack()
+        
+        self.device_stats_label = tk.Label(header_frame,
+                                          text="Detected: 0 devices • Selected: 0 devices",
+                                          bg=self.colors['secondary'],
+                                          fg=self.colors['text_secondary'],
+                                          font=('Segoe UI', 9))
+        self.device_stats_label.pack(pady=(5, 0))
+        
+        # Advanced device controls
+        controls_frame = tk.Frame(device_panel, bg=self.colors['secondary'])
+        controls_frame.pack(fill=tk.X, padx=15, pady=(0, 15))
+        
+        # Row 1: Detection and selection
+        control_row1 = tk.Frame(controls_frame, bg=self.colors['secondary'])
+        control_row1.pack(fill=tk.X, pady=(0, 5))
+        
+        refresh_btn = tk.Button(control_row1,
+                               text="🔄 Refresh",
+                               bg=self.colors['accent'],
+                               fg='white',
+                               font=('Segoe UI', 9, 'bold'),
+                               relief=tk.FLAT,
+                               command=self.detect_devices)
+        refresh_btn.pack(side=tk.LEFT, padx=(0, 5))
+        
+        auto_select_btn = tk.Button(control_row1,
+                                   text="⚡ Auto Select",
+                                   bg=self.colors['success'],
+                                   fg='white',
+                                   font=('Segoe UI', 9, 'bold'),
+                                   relief=tk.FLAT,
+                                   command=self.auto_select_safe_devices)
+        auto_select_btn.pack(side=tk.LEFT, padx=5)
+        
+        clear_btn = tk.Button(control_row1,
+                             text="🗑️ Clear All",
+                             bg=self.colors['warning'],
+                             fg='white',
+                             font=('Segoe UI', 9, 'bold'),
+                             relief=tk.FLAT,
+                             command=self.clear_all_selections)
+        clear_btn.pack(side=tk.LEFT, padx=(5, 0))
+        
+        # Device list with advanced features
+        list_container = tk.Frame(device_panel, bg=self.colors['secondary'])
+        list_container.pack(fill=tk.BOTH, expand=True, padx=15, pady=(0, 15))
+        
+        # List instructions
+        tk.Label(list_container,
+                text="💡 Double-click to select • Color-coded by priority • Smart wiping order",
+                bg=self.colors['secondary'],
+                fg=self.colors['text_secondary'],
+                font=('Segoe UI', 8)).pack(anchor='w', pady=(0, 8))
+        
+        # Device listbox with scrollbar
+        listbox_frame = tk.Frame(list_container, bg=self.colors['secondary'])
+        listbox_frame.pack(fill=tk.BOTH, expand=True)
+        
+        self.device_listbox = tk.Listbox(listbox_frame,
+                                        bg=self.colors['tertiary'],
+                                        fg=self.colors['text_primary'],
+                                        selectbackground=self.colors['accent'],
+                                        selectforeground='white',
+                                        font=('Consolas', 9),
+                                        relief=tk.FLAT,
+                                        activestyle='none')
+        
+        device_scrollbar = tk.Scrollbar(listbox_frame, orient=tk.VERTICAL,
+                                       command=self.device_listbox.yview)
+        self.device_listbox.configure(yscrollcommand=device_scrollbar.set)
+        
+        self.device_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        device_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        # Bind events
+        self.device_listbox.bind('<Double-Button-1>', self.toggle_device_selection)
+        self.device_listbox.bind('<Button-3>', self.show_device_context_menu)  # Right-click
+        
+        # Priority explanation
+        priority_frame = tk.Frame(device_panel, bg=self.colors['secondary'])
+        priority_frame.pack(fill=tk.X, padx=15, pady=(0, 15))
+        
+        priority_info = """🎯 SIH2025 Smart Wiping Strategy:
+🔌 Priority 1: External devices (USB, SD cards) - Wiped first
+💽 Priority 2: Internal drives (data storage) - Wiped second
+🖥️ Priority 3: OS drives (system) - Wiped last after certificate backup
+
+🔒 NIST Process: Zero → Ones → Random → Pattern → Zero + Verify
+📜 Certificates: Auto-saved to bootable USB drive"""
+        
+        tk.Label(priority_frame,
+                text=priority_info,
+                bg=self.colors['secondary'],
+                fg=self.colors['text_secondary'],
+                font=('Segoe UI', 8),
+                justify=tk.LEFT).pack(anchor='w')
+    
+    def create_operations_panel(self, parent):
+        """Create comprehensive operations panel"""
+        ops_panel = tk.Frame(parent, bg=self.colors['secondary'], relief=tk.RAISED, bd=2)
+        ops_panel.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=(8, 0))
+        
+        # Operations header
+        header = tk.Label(ops_panel,
+                         text="⚙️ SIH2025 Wiping Operations Center",
+                         bg=self.colors['secondary'],
+                         fg=self.colors['text_primary'],
+                         font=('Segoe UI', 14, 'bold'))
+        header.pack(pady=15)
+        
+        # Current operation status with enhanced display
+        self.create_operation_status_display(ops_panel)
+        
+        # Multi-level progress indicators
+        self.create_progress_indicators(ops_panel)
+        
+        # Advanced control buttons
+        self.create_advanced_controls(ops_panel)
+        
+        # Real-time operation log
+        self.create_operation_log(ops_panel)
+    
+    def create_operation_status_display(self, parent):
+        """Create enhanced operation status display"""
+        status_container = tk.Frame(parent, bg=self.colors['info'], relief=tk.RAISED, bd=2)
+        status_container.pack(fill=tk.X, padx=15, pady=(0, 15))
+        
+        tk.Label(status_container,
+                text="📋 Current Operation Status",
+                bg=self.colors['info'],
+                fg=self.colors['text_primary'],
+                font=('Segoe UI', 11, 'bold')).pack(pady=(12, 8))
+        
+        self.operation_status_var = tk.StringVar()
+        self.operation_status_var.set("🟢 SIH2025 System Ready - Select devices to begin secure wiping")
+        
+        self.operation_status_label = tk.Label(status_container,
+                                              textvariable=self.operation_status_var,
+                                              bg=self.colors['info'],
+                                              fg=self.colors['text_primary'],
+                                              font=('Segoe UI', 10),
+                                              wraplength=380,
+                                              justify=tk.LEFT)
+        self.operation_status_label.pack(pady=(0, 12), padx=12)
+        
+        # Operation timer
+        self.operation_timer_var = tk.StringVar()
+        self.operation_timer_var.set("⏱️ Elapsed: 00:00:00")
+        
+        tk.Label(status_container,
+                textvariable=self.operation_timer_var,
+                bg=self.colors['info'],
+                fg=self.colors['text_secondary'],
+                font=('Segoe UI', 9)).pack(pady=(0, 8))
+    
+    def create_progress_indicators(self, parent):
+        """Create comprehensive progress indicators"""
+        progress_container = tk.Frame(parent, bg=self.colors['secondary'])
+        progress_container.pack(fill=tk.X, padx=15, pady=(0, 15))
+        
+        # Overall progress
+        tk.Label(progress_container,
+                text="📊 Overall Progress",
+                bg=self.colors['secondary'],
+                fg=self.colors['text_primary'],
+                font=('Segoe UI', 10, 'bold')).pack(anchor='w')
+        
+        self.overall_progress = ttk.Progressbar(progress_container, 
+                                               length=380, 
+                                               mode='determinate',
+                                               style='SIH.Horizontal.TProgressbar')
+        self.overall_progress.pack(fill=tk.X, pady=(5, 3))
+        
+        self.overall_progress_text = tk.StringVar()
+        self.overall_progress_text.set("0% - Waiting to start SIH2025 wiping process")
+        tk.Label(progress_container,
+                textvariable=self.overall_progress_text,
+                bg=self.colors['secondary'],
+                fg=self.colors['text_secondary'],
+                font=('Segoe UI', 9)).pack(anchor='w', pady=(0, 10))
+        
+        # Current device progress
+        tk.Label(progress_container,
+                text="💽 Current Device Progress",
+                bg=self.colors['secondary'],
+                fg=self.colors['text_primary'],
+                font=('Segoe UI', 10, 'bold')).pack(anchor='w')
+        
+        self.device_progress = ttk.Progressbar(progress_container, 
+                                              length=380, 
+                                              mode='determinate')
+        self.device_progress.pack(fill=tk.X, pady=(5, 3))
+        
+        self.device_progress_text = tk.StringVar()
+        self.device_progress_text.set("0% - No device currently being processed")
+        tk.Label(progress_container,
+                textvariable=self.device_progress_text,
+                bg=self.colors['secondary'],
+                fg=self.colors['text_secondary'],
+                font=('Segoe UI', 9)).pack(anchor='w', pady=(0, 10))
+        
+        # Layer progress (NIST 5-layer process)
+        tk.Label(progress_container,
+                text="🔄 NIST Layer Progress",
+                bg=self.colors['secondary'],
+                fg=self.colors['text_primary'],
+                font=('Segoe UI', 10, 'bold')).pack(anchor='w')
+        
+        self.layer_progress = ttk.Progressbar(progress_container, 
+                                             length=380, 
+                                             mode='determinate')
+        self.layer_progress.pack(fill=tk.X, pady=(5, 3))
+        
+        self.layer_progress_text = tk.StringVar()
+        self.layer_progress_text.set("0% - No layer currently active")
+        tk.Label(progress_container,
+                textvariable=self.layer_progress_text,
+                bg=self.colors['secondary'],
+                fg=self.colors['text_secondary'],
+                font=('Segoe UI', 9)).pack(anchor='w')
+    
+    def create_advanced_controls(self, parent):
+        """Create advanced control buttons"""
+        controls_container = tk.Frame(parent, bg=self.colors['secondary'])
+        controls_container.pack(fill=tk.X, padx=15, pady=(20, 0))
+        
+        # Main action button
+        self.main_action_button = tk.Button(controls_container,
+                                           text="🚀 START SIH2025 SECURE WIPING PROCESS",
+                                           bg=self.colors['accent'],
+                                           fg='white',
+                                           font=('Segoe UI', 12, 'bold'),
+                                           relief=tk.FLAT,
+                                           height=2,
+                                           command=self.initiate_secure_wiping)
+        self.main_action_button.pack(fill=tk.X, pady=(0, 12))
+        
+        # Control buttons row
+        control_buttons_row = tk.Frame(controls_container, bg=self.colors['secondary'])
+        control_buttons_row.pack(fill=tk.X)
+        
+        self.pause_button = tk.Button(control_buttons_row,
+                                     text="⏸️ Pause",
+                                     bg=self.colors['warning'],
+                                     fg='white',
+                                     font=('Segoe UI', 9, 'bold'),
+                                     relief=tk.FLAT,
+                                     state='disabled',
+                                     command=self.pause_operation)
+        self.pause_button.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 4))
+        
+        self.cancel_button = tk.Button(control_buttons_row,
+                                      text="❌ Cancel",
+                                      bg=self.colors['accent'],
+                                      fg='white',
+                                      font=('Segoe UI', 9, 'bold'),
+                                      relief=tk.FLAT,
+                                      state='disabled',
+                                      command=self.cancel_operation)
+        self.cancel_button.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(4, 0))
+    
+    def create_operation_log(self, parent):
+        """Create comprehensive operation log"""
+        log_container = tk.Frame(parent, bg=self.colors['secondary'])
+        log_container.pack(fill=tk.BOTH, expand=True, padx=15, pady=(20, 15))
+        
+        # Log header with controls
+        log_header = tk.Frame(log_container, bg=self.colors['secondary'])
+        log_header.pack(fill=tk.X, pady=(0, 8))
+        
+        tk.Label(log_header,
+                text="📜 SIH2025 Operation Log",
+                bg=self.colors['secondary'],
+                fg=self.colors['text_primary'],
+                font=('Segoe UI', 10, 'bold')).pack(side=tk.LEFT)
+        
+        clear_log_btn = tk.Button(log_header,
+                                 text="🗑️ Clear",
+                                 bg=self.colors['tertiary'],
+                                 fg='white',
+                                 font=('Segoe UI', 8),
+                                 relief=tk.FLAT,
+                                 command=self.clear_operation_log)
+        clear_log_btn.pack(side=tk.RIGHT)
+        
+        # Log text area with scrollbar
+        log_text_frame = tk.Frame(log_container, bg=self.colors['secondary'])
+        log_text_frame.pack(fill=tk.BOTH, expand=True)
+        
+        self.log_text = tk.Text(log_text_frame,
+                               bg=self.colors['tertiary'],
+                               fg=self.colors['text_primary'],
+                               font=('Consolas', 8),
+                               relief=tk.FLAT,
+                               wrap=tk.WORD,
+                               height=12,
+                               state=tk.DISABLED)
+        
+        log_scrollbar = tk.Scrollbar(log_text_frame, orient=tk.VERTICAL,
+                                    command=self.log_text.yview)
+        self.log_text.configure(yscrollcommand=log_scrollbar.set)
+        
+        self.log_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        log_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        # Add initial log messages
+        self.add_log_message("🏆 SIH2025 Secure Wipe Tool initialized successfully")
+        self.add_log_message("💡 E-waste Data Security Challenge solution loaded")
+        self.add_log_message("🔍 Ready to detect and securely wipe storage devices")
+    
+    def create_status_panel(self, parent):
+        """Create comprehensive status panel"""
+        status_panel = tk.Frame(parent, bg=self.colors['info'], relief=tk.RAISED, bd=2)
+        status_panel.pack(fill=tk.X, pady=(15, 0))
+        
+        # Status information
+        status_left = tk.Frame(status_panel, bg=self.colors['info'])
+        status_left.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        
+        self.main_status_var = tk.StringVar()
+        self.main_status_var.set("🟢 SIH2025 Ready - E-waste Data Security Solution loaded")
+        
+        status_main_label = tk.Label(status_left,
+                                    textvariable=self.main_status_var,
+                                    bg=self.colors['info'],
+                                    fg=self.colors['text_primary'],
+                                    font=('Segoe UI', 9),
+                                    anchor='w')
+        status_main_label.pack(side=tk.LEFT, padx=12, pady=8)
+        
+        # Certificate storage status
+        status_right = tk.Frame(status_panel, bg=self.colors['info'])
+        status_right.pack(side=tk.RIGHT)
+        
+        self.cert_storage_status_var = tk.StringVar()
+        self.cert_storage_status_var.set("📁 Certificates: Detecting storage...")
+        
+        cert_status_label = tk.Label(status_right,
+                                    textvariable=self.cert_storage_status_var,
+                                    bg=self.colors['info'],
+                                    fg=self.colors['text_secondary'],
+                                    font=('Segoe UI', 9),
+                                    anchor='e')
+        cert_status_label.pack(side=tk.RIGHT, padx=12, pady=8)
+    
+    def initialize_application(self):
+        """Initialize the application with device detection and USB status"""
+        self.add_log_message("🚀 Initializing SIH2025 application components...")
+        
+        # Update USB status
+        self.update_usb_certificate_status()
+        
+        # Detect devices
+        self.detect_devices()
+        
+        # Start timer update
+        self.update_operation_timer()
+        
+        self.add_log_message("✅ SIH2025 initialization completed successfully")
+    
+    def update_usb_certificate_status(self):
+        """Update USB certificate storage status"""
+        if self.cert_generator.usb_detected:
+            usb_path = self.cert_generator.cert_dir
+            self.usb_status_label.config(
+                text=f"💾 USB Certificate Storage: {usb_path}",
+                fg=self.colors['success']
+            )
+            self.cert_storage_status_var.set("💾 Certificates: USB Drive (Ready)")
+            self.add_log_message(f"✅ USB certificate storage detected: {usb_path}")
+        else:
+            local_path = self.cert_generator.cert_dir
+            self.usb_status_label.config(
+                text="⚠️ USB not found - Using local certificate storage",
+                fg=self.colors['warning']
+            )
+            self.cert_storage_status_var.set("📁 Certificates: Local Storage")
+            self.add_log_message(f"⚠️ USB not detected, using local storage: {local_path}")
+    
+    def detect_devices(self):
+        """Comprehensive device detection with smart categorization"""
+        self.add_log_message("🔍 SIH2025: Starting comprehensive device detection...")
+        self.main_status_var.set("🔄 Scanning for storage devices...")
+        
+        try:
+            # Clear existing devices
+            self.devices.clear()
+            self.device_listbox.delete(0, tk.END)
+            
+            # Read system partition information
+            with open('/proc/partitions', 'r') as f:
+                partition_lines = f.readlines()
+            
+            device_count = 0
+            for line in partition_lines[2:]:  # Skip header lines
+                parts = line.strip().split()
+                if len(parts) >= 4:
+                    major, minor, blocks, device_name = parts[:4]
+                    
+                    # Filter for whole disks (not partitions)
+                    if not any(device_name.endswith(str(i)) for i in range(10)):
+                        device_info = self.analyze_device(device_name, blocks)
+                        if device_info:
+                            self.devices.append(device_info)
+                            self.add_device_to_display(device_info)
+                            device_count += 1
+            
+            self.update_device_statistics()
+            self.main_status_var.set(f"✅ SIH2025: Detected {device_count} storage devices")
+            self.add_log_message(f"✅ Device detection completed: {device_count} devices found")
+            
+        except Exception as e:
+            error_msg = f"❌ SIH2025: Device detection failed: {str(e)}"
+            self.add_log_message(error_msg)
+            self.main_status_var.set("❌ Device detection error")
+    
+    def analyze_device(self, device_name, blocks):
+        """Comprehensive device analysis with SIH2025 categorization"""
+        device_path = f"/dev/{device_name}"
+        
+        if not os.path.exists(device_path):
+            return None
+        
+        try:
+            # Basic device information
+            device_info = {
+                'name': device_name,
+                'path': device_path,
+                'blocks': int(blocks),
+                'size': self.format_bytes(int(blocks) * 512),
+                'type': 'Unknown',
+                'priority': 3,  # Default to lowest priority
+                'selected': False,
+                'removable': False,
+                'os_drive': False,
+                'model': 'Generic Device',
+                'interface': 'Unknown'
+            }
+            
+            sys_block_path = f"/sys/block/{device_name}"
+            
+            # Determine if device is removable
+            try:
+                with open(f"{sys_block_path}/removable", 'r') as f:
+                    device_info['removable'] = f.read().strip() == '1'
+                    if device_info['removable']:
+                        device_info['priority'] = 1  # External devices have highest priority
+            except:
+                pass
+            
+            # Determine device type (SSD/HDD/NVMe)
+            try:
+                with open(f"{sys_block_path}/queue/rotational", 'r') as f:
+                    if f.read().strip() == '0':
+                        device_info['type'] = 'SSD'
+                    else:
+                        device_info['type'] = 'HDD'
+            except:
+                pass
+            
+            # Special handling for NVMe devices
+            if 'nvme' in device_name.lower():
+                device_info['type'] = 'NVMe SSD'
+                device_info['interface'] = 'NVMe'
+            elif device_info['type'] in ['SSD', 'HDD']:
+                device_info['interface'] = 'SATA'
+            elif device_info['removable']:
+                device_info['interface'] = 'USB'
+            
+            # Determine if this is the OS drive
+            device_info['os_drive'] = self.check_if_os_drive(device_path)
+            if device_info['os_drive']:
+                device_info['priority'] = 3  # OS drives have lowest priority (wiped last)
+            elif not device_info['removable']:
+                device_info['priority'] = 2  # Internal non-OS drives have medium priority
+            
+            # Try to get device model information
+            try:
+                with open(f"{sys_block_path}/device/model", 'r') as f:
+                    device_info['model'] = f.read().strip()
+            except:
+                pass
+            
+            return device_info
+            
+        except Exception as e:
+            self.add_log_message(f"⚠️ Error analyzing device {device_name}: {str(e)}")
+            return None
+    
+    def check_if_os_drive(self, device_path):
+        """Check if device contains the operating system"""
+        try:
+            with open('/proc/mounts', 'r') as f:
+                for line in f:
+                    mount_parts = line.split()
+                    if len(mount_parts) >= 2:
+                        mounted_device = mount_parts[0]
+                        mount_point = mount_parts[1]
+                        
+                        # Check if any partition of this device is mounted as root
+                        if mounted_device.startswith(device_path) and mount_point == '/':
+                            return True
+            return False
+        except:
+            return False
+    
+    def format_bytes(self, byte_count):
+        """Format byte count to human-readable format"""
+        if byte_count == 0:
+            return "0 B"
+        
+        units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+        unit_index = 0
+        
+        while byte_count >= 1024 and unit_index < len(units) - 1:
+            byte_count /= 1024.0
+            unit_index += 1
+        
+        return f"{byte_count:.1f} {units[unit_index]}"
+    
+    def add_device_to_display(self, device_info):
+        """Add device to display with advanced formatting and color coding"""
+        # Priority icons and formatting
+        priority_icons = {
+            1: "🔌",  # External/Removable
+            2: "💽",  # Internal
+            3: "🖥️"   # OS/System
+        }
+        
+        priority_icon = priority_icons.get(device_info['priority'], "❓")
+        
+        # Status description
+        if device_info['os_drive']:
+            status_desc = "OS Drive"
+        elif device_info['removable']:
+            status_desc = "External"
+        else:
+            status_desc = "Internal"
+        
+        # Create formatted display text
+        display_text = (f"{priority_icon} {device_info['name']} │ "
+                       f"{device_info['type']} │ "
+                       f"{device_info['size']} │ "
+                       f"{status_desc} │ "
+                       f"{device_info['interface']}")
+        
+        self.device_listbox.insert(tk.END, display_text)
+        
+        # Apply color coding based on priority
+        item_index = self.device_listbox.size() - 1
+        if device_info['priority'] == 1:
+            self.device_listbox.itemconfig(item_index, {'bg': '#1e4d3b'})  # Dark green
+        elif device_info['priority'] == 2:
+            self.device_listbox.itemconfig(item_index, {'bg': '#4d3e1e'})  # Dark yellow/brown
+        elif device_info['priority'] == 3:
+            self.device_listbox.itemconfig(item_index, {'bg': '#4d1e1e'})  # Dark red
+    
+    def toggle_device_selection(self, event=None):
+        """Toggle device selection with visual feedback"""
+        selection_indices = self.device_listbox.curselection()
+        if not selection_indices:
+            return
+        
+        device_index = selection_indices[0]
+        if device_index < len(self.devices):
+            device = self.devices[device_index]
+            device['selected'] = not device['selected']
+            
+            current_text = self.device_listbox.get(device_index)
+            
+            if device['selected']:
+                new_text = "✅ " + current_text
+                if device['path'] not in self.selected_devices:
+                    self.selected_devices.append(device['path'])
+                self.add_log_message(f"✅ Selected device: {device['name']} ({device['type']})")
+            else:
+                new_text = current_text.replace("✅ ", "")
+                if device['path'] in self.selected_devices:
+                    self.selected_devices.remove(device['path'])
+                self.add_log_message(f"❌ Deselected device: {device['name']}")
+            
+            # Update display
+            self.device_listbox.delete(device_index)
+            self.device_listbox.insert(device_index, new_text)
+            
+            self.update_device_statistics()
+            self.update_selection_status()
+    
+    def auto_select_safe_devices(self):
+        """Automatically select devices that are safe to wipe (non-OS)"""
+        self.selected_devices.clear()
+        safe_device_count = 0
+        
+        for i, device in enumerate(self.devices):
+            if not device['os_drive']:  # Select all non-OS drives
+                device['selected'] = True
+                self.selected_devices.append(device['path'])
+                safe_device_count += 1
+                
+                # Update display
+                current_text = self.device_listbox.get(i)
+                if not current_text.startswith("✅"):
+                    new_text = "✅ " + current_text
+                    self.device_listbox.delete(i)
+                    self.device_listbox.insert(i, new_text)
+		self.update_device_statistics()
         self.update_selection_status()
         self.add_log_message(f"⚡ Auto-selected {safe_device_count} safe devices (OS drives excluded)")
     
