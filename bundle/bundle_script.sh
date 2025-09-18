@@ -1975,8 +1975,35 @@ def main():
     print("Smart India Hackathon 2025")
     print("Addressing India's ₹50,000+ Crore E-waste Challenge")
     print("NIST SP 800-88 Compliant • USB Certificate Storage • Air-Gapped Operation")
-    print()        problem_statement = tk.Label(title_section,
-                                     text="💰 Addressing India's ₹50,000+ Crore E-waste Challenge with Secure Data Wiping",
+    print() 
+	def create_sih2025_header(self, parent):
+        """Create comprehensive SIH2025 header with branding"""
+        header_frame = tk.Frame(parent, bg=self.colors['secondary'], relief=tk.RAISED, bd=3)
+        header_frame.pack(fill=tk.X, pady=(0, 15))
+
+        # Title section with SIH2025 branding
+        title_section = tk.Frame(header_frame, bg=self.colors['secondary'])
+        title_section.pack(pady=20)
+
+        # Main title with emoji and styling
+        main_title = tk.Label(title_section,
+                             text="🏆 SIH2025 E-WASTE DATA SECURITY SOLUTION",
+                             bg=self.colors['secondary'],
+                             fg=self.colors['success'],
+                             font=('Segoe UI', 22, 'bold'))
+        main_title.pack()
+
+        # Subtitle with challenge details
+        subtitle = tk.Label(title_section,
+                           text="Smart India Hackathon 2025 • NIST SP 800-88 Compliant • USB Certificate Storage",
+                           bg=self.colors['secondary'],
+                           fg=self.colors['text_primary'],
+                           font=('Segoe UI', 12))
+        subtitle.pack(pady=(3, 0))
+
+        # Problem statement reference
+        problem_statement = tk.Label(title_section,
+									text="💰 Addressing India's ₹50,000+ Crore E-waste Challenge with Secure Data Wiping",
                                      bg=self.colors['secondary'],
                                      fg=self.colors['text_secondary'],
                                      font=('Segoe UI', 11, 'italic'))
